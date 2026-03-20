@@ -23,8 +23,8 @@ The causal graph structure enables security analysts to understand *which behavi
 
 ## Key Results (CERT r4.2)
 
-| Metric | SIND | Best from All Competitor |
-|--------|------|-----------------|
+| Metric | SIND | Best from All Competitors |
+|--------|------|---------------------------|
 | Accuracy | **0.980** | 0.972 |
 | Precision | **0.900** | — |
 | Recall | **0.970** | 0.884 |
@@ -59,15 +59,9 @@ The core model combines:
 
 This captures behavioral correlations (e.g., USB connect → file copy) without the exponential CPT growth of fully connected structures.
 
-### Behavioral Domains & Selected Features (Top-24)
+---
 
-| Domain | Representative Features |
-|--------|------------------------|
-| `device` | `device_usb_connects`, `device_usb_disconnects`, `device_max_daily_device_events`, `device_offhour_device_ratio`, `device_active_days`, ... |
-| `logon` | `logon_offhour_logon_count`, `logon_unique_pcs`, `logon_failed_logons`, ... |
-| `file` | `file_total_file_events`, `file_unique_files`, `file_unique_file_types`, ... |
-| `email` | `email_email_total_attachments`, `email_total_recipients`, ... |
-| `http` / `web` | Web browsing behavioral aggregates |
+## Selected Features
 
 The 24 features used by SIND are derived via Mutual Information analysis across five behavioral domains.
 
@@ -97,20 +91,24 @@ The 24 features used by SIND are derived via Mutual Information analysis across 
 | `file_pdf_files_accessed` | Number of accessed PDF files. |
 | `file_exe_files_accessed` | Number of accessed executable files (`.exe`). |
 | `http_unique_urls_visited` | Number of unique visited HTTP URLs. |
+
 ---
 
 ## Repository Contents
 
 ```
 SIND/
-├── SIND _Semi_Naive_InsiderDetector.ipynb   # Main notebook — full pipeline
-├── 4.2_meses_18.zip                         # Preprocessed CERT r4.2 splits
+├── Extração de Features.ipynb               # Step 1 — raw CERT r4.2 logs → user-level feature matrix
+├── SIND _Semi_Naive_InsiderDetector.ipynb   # Step 2 — feature selection, SMOTE, BN training & evaluation
+├── 4.2_meses_18.zip                         # Preprocessed CERT r4.2 splits (output of Step 1)
 │   ├── X_train.csv
 │   ├── X_test.csv
 │   ├── y_train.csv
 │   └── y_test.csv
 └── README.md
 ```
+
+The two notebooks form a sequential pipeline: **`Extração de Features`** processes the raw CERT r4.2 CSV logs into a per-user behavioral feature matrix, and **`SIND`** consumes that matrix to train and evaluate the Semi-Naive Bayesian Network.
 
 ---
 
@@ -120,6 +118,7 @@ SIND/
 
 - Python 3.8+
 - Jupyter Notebook or Google Colab
+- Raw CERT r4.2 logs (required only if re-running feature extraction — see Option B)
 
 ### Installation
 
@@ -133,7 +132,9 @@ Or in a Colab/notebook cell:
 !pip install pgmpy scikit-learn networkx matplotlib seaborn xgboost imblearn
 ```
 
-### Running the Notebook
+### Option A — Run from preprocessed splits (recommended)
+
+Use the included `4.2_meses_18.zip` to reproduce the SIND results without re-extracting features.
 
 1. Clone the repository:
    ```bash
@@ -146,18 +147,36 @@ Or in a Colab/notebook cell:
    unzip 4.2_meses_18.zip
    ```
 
-3. Open and run the notebook:
+3. Open and run the main notebook:
    ```bash
    jupyter notebook "SIND _Semi_Naive_InsiderDetector.ipynb"
    ```
-   
-   Update the data paths at the top of the notebook to point to the extracted CSVs:
+
+   Update the data paths at the top of the notebook:
    ```python
    X_train = pd.read_csv('./4.2_meses_18/X_train.csv')
    X_test  = pd.read_csv('./4.2_meses_18/X_test.csv')
    y_train = pd.read_csv('./4.2_meses_18/y_train.csv').squeeze()
    y_test  = pd.read_csv('./4.2_meses_18/y_test.csv').squeeze()
    ```
+
+### Option B — Full pipeline from raw logs
+
+To reproduce everything from scratch starting from the original CERT r4.2 event logs:
+
+1. Download the raw CERT r4.2 dataset (see [Dataset](#dataset)) and place the CSVs under `/srv/cert/r4.2/`:
+   ```
+   /srv/cert/r4.2/
+   ├── device.csv
+   ├── logon.csv
+   ├── file.csv
+   ├── email.csv
+   └── http.csv
+   ```
+
+2. Run **`Extração de Features.ipynb`**. The notebook parses each event source, computes per-user behavioral aggregates, joins all domain tables on `user`, and assigns binary labels from the ground-truth metadata.
+
+3. Use the resulting feature matrix as input to **`SIND _Semi_Naive_InsiderDetector.ipynb`**.
 
 ---
 
@@ -173,6 +192,20 @@ The preprocessed train/test splits (`4.2_meses_18.zip`) are included directly in
 ---
 
 ## Notebook Structure
+
+### `Extração de Features.ipynb` — Feature Engineering
+
+| Step | Description |
+|------|-------------|
+| Device features | Parse `device.csv`; compute connect/disconnect counts, off-hours ratios, active days, unique PCs |
+| Logon features | Parse `logon.csv`; compute session durations, logon/logoff ratios, missing logoff counts |
+| File features | Parse `file.csv`; compute total/unique file accesses, PDF and executable file counts |
+| Email features | Parse `email.csv`; compute attachment totals, unique BCC/To recipients, mean text length |
+| HTTP features | Parse `http.csv`; compute total requests and unique URLs per user |
+| Feature merging | Left-join all domain tables on `user`; fill missing values; apply domain prefix (`device_*`, `logon_*`, …) |
+| Labeling | Assign binary labels (`1` = malicious, `0` = normal) from ground-truth metadata |
+
+### `SIND _Semi_Naive_InsiderDetector.ipynb` — Detection Pipeline
 
 | Section | Description |
 |---------|-------------|
@@ -214,7 +247,7 @@ If you use SIND in your research, please cite:
                Almeida, Anna C. F. and R{\^e}go, Igor F. B. do and
                Morais, Anderson M. de and Santos, Wellison R. M. and
                Aires, Fernando and Lima, Milton and Campos, J. R.},
-  booktitle = {EEE International Conference on Systems, Man, and Cybernetics (SMC)},
+  booktitle = {IEEE International Conference on Systems, Man, and Cybernetics (SMC)},
   year      = {2026},
   note      = {Funded by EMBRAPII, Project CIS-AFCCT-2024-7-26-2}
 }
