@@ -23,7 +23,7 @@ The causal graph structure enables security analysts to understand *which behavi
 
 ## Key Results (CERT r4.2)
 
-| Metric | SIND | Best Competitor |
+| Metric | SIND | Best from All Competitor |
 |--------|------|-----------------|
 | Accuracy | **0.980** | 0.972 |
 | Precision | **0.900** | — |
@@ -69,8 +69,34 @@ This captures behavioral correlations (e.g., USB connect → file copy) without 
 | `email` | `email_email_total_attachments`, `email_total_recipients`, ... |
 | `http` / `web` | Web browsing behavioral aggregates |
 
-Feature selection uses **Mutual Information** (`mutual_info_classif`) to retain the top-24 most discriminative attributes.
+The 24 features used by SIND are derived via Mutual Information analysis across five behavioral domains.
 
+| Feature | Description |
+|---------|-------------|
+| `device_std_daily_device_events` | Standard deviation of daily device events. |
+| `device_mean_daily_device_events` | Mean number of daily device events. |
+| `device_max_daily_device_events` | Maximum number of device events in a single day. |
+| `device_device_events_total` | Total number of device events. |
+| `device_offhour_device_ratio` | Ratio of off-hours device events to total events. |
+| `device_offhour_device_count` | Absolute count of off-hours device events. |
+| `device_active_days` | Number of days in which the device was active. |
+| `device_unique_pcs_used` | Number of distinct PCs used by the user. |
+| `device_usb_connects` | Count of USB device connections. |
+| `logon_total_logons_day` | Total number of daily logons. |
+| `logon_total_logoffs_day` | Total number of daily logoffs. |
+| `logon_sessions_total_duration` | Total duration of logon sessions. |
+| `logon_open_sessions_mean` | Mean number of simultaneously open sessions. |
+| `logon_missing_logoff_count` | Count of logons without corresponding logoff. |
+| `logon_logon_to_logoff_ratio` | Ratio between logons and logoffs. |
+| `logon_distinct_pcs_used` | Number of distinct PCs accessed through logon. |
+| `email_n_email` | Total number of sent/received emails. |
+| `email_email_total_attachments` | Total number of email attachments. |
+| `email_email_unique_bcc` | Number of unique BCC recipients. |
+| `email_email_unique_to` | Number of unique recipients in the To field. |
+| `email_email_mean_text_len` | Mean length of email text. |
+| `file_pdf_files_accessed` | Number of accessed PDF files. |
+| `file_exe_files_accessed` | Number of accessed executable files (`.exe`). |
+| `http_unique_urls_visited` | Number of unique visited HTTP URLs. |
 ---
 
 ## Repository Contents
