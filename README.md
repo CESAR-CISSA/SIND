@@ -42,14 +42,7 @@ Evaluated on a strictly imbalanced test set (279 normal / 21 malicious) to refle
 
 SIND operates as a four-stage end-to-end pipeline:
 
-```
-Raw Logs → Behavioral Feature Engineering
-        → Mutual Information Feature Selection (X_sel)
-        → SMOTE Class Balancing (X_bal)
-        → Semi-Naive Bayesian Network (MAP/BDeu)
-        → Calibrated Risk Score P(Label=1 | evidence)
-        → Binary Prediction ŷ ∈ {0, 1}
-```
+<img width="1449" height="304" alt="Captura de tela 2026-03-20 134018" src="https://github.com/user-attachments/assets/70dc400a-8b3c-482c-aa87-bfe7e122838a" />
 
 ### Semi-Naive Bayesian Network
 
