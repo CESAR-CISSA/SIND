@@ -1,12 +1,12 @@
 # SIND — Semi-Naive Insider Detector
 
-> **SIND: A Semi-Naive Bayesian Approach for Insider Threat Detection**  
+<!-- > **SIND: A Semi-Naive Bayesian Approach for Insider Threat Detection**  
 > Matheus V. P. dos Santos, José Edson C. A. Júnior, Damião de O. M. Neto, Pedro H. G. Liberal, Anna C. F. Almeida, Igor F. B. do Rêgo, Anderson M. de Morais, Wellison R. M. Santos, Fernando Aires, Milton Lima, J. R. Campos  
 > CESAR / CISSA — Center for Security in Advanced Systems, Recife, Brazil  
-> *Funded by EMBRAPII — Project CIS-AFCCT-2024-7-26-2*
+> *Funded by EMBRAPII — Project CIS-AFCCT-2024-7-26-2* 
 
 ---
-
+-->
 ## Overview
 
 Insider threats represent a critical challenge in organizational cybersecurity: malicious actors with legitimate access can cause significant damage while evading conventional detection mechanisms. Existing approaches typically sacrifice interpretability for accuracy, or rely on large volumes of labeled data that are rarely available in practice.
@@ -239,7 +239,7 @@ Key hyperparameters:
 | `N_LATENT_STATES` | `3` | States per latent domain node |
 
 ---
-
+<!--
 ## Citation
 
 If you use SIND in your research, please cite:
@@ -269,7 +269,7 @@ Affiliations:
 - **CISUC / University of Coimbra** — Centre for Informatics and Systems of the University of Coimbra, Portugal
 
 ---
-
+-->
 ## License
 
 This repository is released for research and academic use. Please refer to [LICENSE](LICENSE) for details.
